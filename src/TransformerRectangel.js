@@ -1,13 +1,12 @@
 import { Rect, Transformer } from "react-konva";
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { useRef, forwardRef, useEffect } from "react";
 
 const TransformerRectangel = forwardRef(function TransformerRectangel(
-  { shapeProps, onSelect, onChange, selectedIds, color },
+  { shapeProps, onSelect, onChange, selectedIds, isSelected },
   trRef
 ) {
   const shapeRef = useRef();
   const shapeId = shapeProps.id;
-  const isSelected = selectedIds.findIndex((id) => id === shapeId) > 1;
 
   useEffect(() => {
     const oldNodes = trRef.current.nodes();
@@ -26,11 +25,14 @@ const TransformerRectangel = forwardRef(function TransformerRectangel(
 
   const onClick = (e) => {
     const metaPressed = e.evt.shiftKey || e.evt.ctrlKey;
+
     let newIds = [];
+
     if (!metaPressed && isSelected) {
       // do nothing if node is selected and no key pressed
       return;
     }
+
     if (!metaPressed && !isSelected) {
       // if no key pressed and the node is not selected
       newIds = [shapeId];
@@ -42,15 +44,13 @@ const TransformerRectangel = forwardRef(function TransformerRectangel(
       // add the node into selection
       newIds = selectedIds.concat(shapeId);
     }
+
     onSelect(newIds);
   };
 
   return (
     <React.Fragment>
       <Rect
-        width={50}
-        height={50}
-        fill={color}
         ref={shapeRef}
         draggable
         onClick={onClick}
@@ -62,8 +62,20 @@ const TransformerRectangel = forwardRef(function TransformerRectangel(
           });
         }}
         onTransformEnd={() => {
+          // const node = shapeRef.current;
+          // const scaleX = node.scaleX();
+          // const scaleY = node.scaleY();
+
+          // we will reset it back
+          // node.scaleX(1);
+          // node.scaleY(1);
           onChange({
             ...shapeProps,
+            // x: node.x(),
+            // y: node.y(),
+            // // set minimal value
+            // width: Math.max(25, node.width() * scaleX),
+            // height: Math.max(node.height() * scaleY),
           });
         }}
         {...shapeProps}
